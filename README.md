@@ -6,6 +6,7 @@ Requirements
 
     yast2-ruby-bindings >= 1.0.0
     rybygem-cheetah
+    rubygem-safe_yaml
 
 WYSIWYG Editor
 ==============
@@ -23,3 +24,9 @@ Note: You have to have y2r cloned to /tmp
 TODO
 ====
 Make it configurable - path to y2r
+
+Configuration
+=============
+y2r-editor can be configured using the [Configure] button.
+You can also edit saved options in YAML-based config file
+later: ${YOUR_HOME}/.y2rconfig
