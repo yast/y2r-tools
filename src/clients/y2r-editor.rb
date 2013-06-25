@@ -12,9 +12,10 @@ module YCP
       require 'yaml'
 
       CONFIG_FILE = '.y2rconfig'
+      USER_TYPING_TIMEOUT = 350
 
       module Default
-        TRANSLATION_TIMEOUT = 500
+        TRANSLATION_TIMEOUT = 400
         Y2R_BIN = '/usr/bin/y2r'
       end
 
@@ -55,10 +56,26 @@ module YCP
         UI.SetFocus(term(:id, IDs::YCP))
       end
 
+      def fillup_ruby_textarea(text)
+        UI.ChangeWidget(term(:id, IDs::RUBY), :Value, text)
+      end
+
+      def user_is_still_typing(ycp_code_1)
+        returned = UI::TimeoutUserInput(USER_TYPING_TIMEOUT)
+        if returned == :timeout
+          ycp_code_2 = UI.QueryWidget(term(:id, IDs::YCP), :Value)
+          # the code has changed
+          return true if ycp_code_1 != ycp_code_2
+        end
+
+        false
+      end
+
       def translate_ycp
         ycp_code = UI.QueryWidget(term(:id, IDs::YCP), :Value)
         return if (ycp_code == @last_ycp_code)
-        return if (ycp_code == '')
+        fillup_ruby_textarea('') and return if (ycp_code == '')
+        return if user_is_still_typing(ycp_code)
 
         Builtins.y2debug('Translating: %1', ycp_code)
         begin
@@ -69,7 +86,7 @@ module YCP
         end
 
         ruby_out = (ruby_err == "" ? "":"#{ruby_err}\n") + ruby_code
-        UI.ChangeWidget(term(:id, IDs::RUBY), :Value, ruby_out)
+        fillup_ruby_textarea(ruby_out)
         @last_ycp_code = ycp_code
       end
 
