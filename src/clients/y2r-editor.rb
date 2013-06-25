@@ -60,12 +60,12 @@ module YCP
         UI.ChangeWidget(term(:id, IDs::RUBY), :Value, text)
       end
 
-      def user_is_still_typing(ycp_code_1)
+      def user_is_still_typing(ycp_code_old)
         returned = UI::TimeoutUserInput(USER_TYPING_TIMEOUT)
         if returned == :timeout
-          ycp_code_2 = UI.QueryWidget(term(:id, IDs::YCP), :Value)
+          ycp_code_new = UI.QueryWidget(term(:id, IDs::YCP), :Value)
           # the code has changed
-          return true if ycp_code_1 != ycp_code_2
+          return ycp_code_old != ycp_code_new
         end
 
         false
@@ -74,7 +74,10 @@ module YCP
       def translate_ycp
         ycp_code = UI.QueryWidget(term(:id, IDs::YCP), :Value)
         return if (ycp_code == @last_ycp_code)
-        fillup_ruby_textarea('') and return if (ycp_code == '')
+        if (ycp_code == '')
+          fillup_ruby_textarea('')
+          return
+        end
         return if user_is_still_typing(ycp_code)
 
         Builtins.y2debug('Translating: %1', ycp_code)
@@ -129,8 +132,6 @@ module YCP
             _("Cannot write configuration to file #{@user_config}.\nReason: #{e.message}")
           )
         end
-
-        ret
       end
 
       def handle_configuration
