@@ -6,6 +6,7 @@ Requirements
 
     yast2-ruby-bindings >= 1.0.0
     rybygem-cheetah
+    rubygem-safe_yaml
 
 WYSIWYG Editor
 ==============
