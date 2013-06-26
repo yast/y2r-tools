@@ -30,3 +30,8 @@ Configuration
 y2r-editor can be configured using the [Configure] button.
 You can also edit saved options in YAML-based config file
 later: ${YOUR_HOME}/.y2rconfig
+
+y2r arguments can be set in `y2r_args`, for example
+
+    # To include the installed modules as directory where to search for modules
+    y2r_args: ["--module-path", "/usr/share/YaST2/modules/"]
