@@ -12,11 +12,11 @@ module YCP
       require 'yaml'
 
       CONFIG_FILE = '.y2rconfig'
-      USER_TYPING_TIMEOUT = 350
+      USER_TYPING_TIMEOUT = 400
 
       module Default
         TRANSLATION_TIMEOUT = 400
-        Y2R_BIN = '/usr/bin/y2r'
+        Y2R_BIN = '/usr/bin/y2r --module-path /usr/share/YaST2/modules/'
       end
 
       module IDs
@@ -81,8 +81,9 @@ module YCP
         return if user_is_still_typing(ycp_code)
 
         Builtins.y2debug('Translating: %1', ycp_code)
+        y2bin_cheetah_format = @y2bin.squeeze(" ").split(" ")
         begin
-          (ruby_code, ruby_err) = Cheetah.run(@y2bin, :stdin => ycp_code, :stdout => :capture, :stderr => :capture)
+          (ruby_code, ruby_err) = Cheetah.run(y2bin_cheetah_format, :stdin => ycp_code, :stdout => :capture, :stderr => :capture)
         rescue Cheetah::ExecutionFailed => e
           ruby_code = e.stdout || ""
           ruby_err  = (e.stderr != "" ? e.stderr : nil) || e.message || ""
