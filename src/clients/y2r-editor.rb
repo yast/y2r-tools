@@ -12,11 +12,11 @@ module YCP
       require 'yaml'
 
       CONFIG_FILE = '.y2rconfig'
-      USER_TYPING_TIMEOUT = 350
+      USER_TYPING_TIMEOUT = 400
 
       module Default
         TRANSLATION_TIMEOUT = 400
-        Y2R_BIN = '/usr/bin/y2r'
+        Y2R_BIN = '/usr/bin/y2r --module-path /usr/share/YaST2/modules/'
       end
 
       module IDs
