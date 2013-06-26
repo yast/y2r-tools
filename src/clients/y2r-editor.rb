@@ -24,6 +24,7 @@ module YCP
         RUBY = :ruby_code
         CONFIGURE = :configure
         PATH_TO_Y2R = 'path_to_y2r'
+        Y2R_ARGS = 'y2r_args'
         TRANSLATION_TIMEOUT = 'timeout'
         OK_BUTTON = :ok
         CANCEL_BUTTON = :cancel
@@ -31,7 +32,8 @@ module YCP
 
       def initialize
         # should be installer here later
-        @y2bin = Default::Y2R_BIN
+        @y2r_bin = Default::Y2R_BIN
+        @y2r_args = []
         @last_ycp_code = ''
         @ui_timeout_milisec = Default::TRANSLATION_TIMEOUT
         @user_config = File.join(ENV['HOME'], CONFIG_FILE)
@@ -82,7 +84,8 @@ module YCP
 
         Builtins.y2debug('Translating: %1', ycp_code)
         begin
-          (ruby_code, ruby_err) = Cheetah.run(@y2bin, :stdin => ycp_code, :stdout => :capture, :stderr => :capture)
+          (ruby_code, ruby_err) = Cheetah.run([@y2r_bin] + @y2r_args,
+            :stdin => ycp_code, :stdout => :capture, :stderr => :capture)
         rescue Cheetah::ExecutionFailed => e
           ruby_code = e.stdout || ""
           ruby_err  = (e.stderr != "" ? e.stderr : nil) || e.message || ""
@@ -108,13 +111,15 @@ module YCP
 
         Builtins.y2milestone("User config: %1", config)
 
-        @y2bin = config[IDs::PATH_TO_Y2R]
+        @y2r_bin = config[IDs::PATH_TO_Y2R]
+        @y2r_args = config[IDs::Y2R_ARGS]
         @ui_timeout_milisec = config[IDs::TRANSLATION_TIMEOUT]
       end
 
       def save_user_settings
         config = {
-          IDs::PATH_TO_Y2R => @y2bin,
+          IDs::PATH_TO_Y2R => @y2r_bin,
+          IDs::Y2R_ARGS => @y2r_args,
           IDs::TRANSLATION_TIMEOUT => @ui_timeout_milisec,
         }
 
@@ -139,7 +144,10 @@ module YCP
           MarginBox(1, 1,
             VBox(
               HSpacing(50),
-              Left(term(:InputField, term(:id, IDs::PATH_TO_Y2R), term(:opt, :hstretch), _('Path to y2r Including Options'), @y2bin)),
+              Left(term(:InputField, term(:id, IDs::PATH_TO_Y2R), term(:opt, :hstretch), _('Path to y2r Including Options'), @y2r_bin)),
+              VSpacing(0.6),
+              Left(Label(_("To configure the y2r arguments, edit #{@user_config} file\nand set #{IDs::Y2R_ARGS} = ['list', 'of', 'args']."))),
+              VSpacing(0.6),
               Left(IntField(term(:id, IDs::TRANSLATION_TIMEOUT), _('Translate Each *n* msec'), 0, 60000, @ui_timeout_milisec)),
             )
           ),
@@ -153,12 +161,12 @@ module YCP
         user_ret = UI.UserInput
 
         if (user_ret == IDs::OK_BUTTON)
-          new_y2bin = UI.QueryWidget(term(:id, IDs::PATH_TO_Y2R), :Value) || Default::Y2R_BUN
+          new_y2r_bin = UI.QueryWidget(term(:id, IDs::PATH_TO_Y2R), :Value) || Default::Y2R_BUN
           new_timeout = UI.QueryWidget(term(:id, IDs::TRANSLATION_TIMEOUT), :Value) || Default::TRANSLATION_TIMEOUT
 
           # settings have changed
-          if (new_y2bin != @y2bin || new_timeout != @ui_timeout_milisec)
-            @y2bin = new_y2bin
+          if (new_y2r_bin != @y2r_bin || new_timeout != @ui_timeout_milisec)
+            @y2r_bin = new_y2r_bin
             @ui_timeout_milisec = new_timeout
             save_user_settings
             trigger_translation
