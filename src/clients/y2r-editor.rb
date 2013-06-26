@@ -148,7 +148,7 @@ module YCP
               HSpacing(50),
               Left(term(:InputField, term(:id, IDs::PATH_TO_Y2R), term(:opt, :hstretch), _('Path to y2r Including Options'), @y2r_bin)),
               VSpacing(0.6),
-              Left(Label(_("To configure the y2r arguments, edit #{@user_config} file\nand set #{IDs::Y2R_ARGS} = ['list', 'of', 'args']."))),
+              Left(Label(_("To configure the y2r arguments, edit #{@user_config} file\nand set #{IDs::Y2R_ARGS}: ['list', 'of', 'args']."))),
               VSpacing(0.6),
               Left(IntField(term(:id, IDs::TRANSLATION_TIMEOUT), _('Translate Each *n* msec'), 0, 60000, @ui_timeout_milisec)),
             )
