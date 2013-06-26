@@ -83,9 +83,9 @@ module YCP
         return if user_is_still_typing(ycp_code)
 
         Builtins.y2debug('Translating: %1', ycp_code)
+        cmd = ([@y2r_bin] + [@y2r_args]).flatten
         begin
-          (ruby_code, ruby_err) = Cheetah.run([@y2r_bin] + @y2r_args,
-            :stdin => ycp_code, :stdout => :capture, :stderr => :capture)
+          (ruby_code, ruby_err) = Cheetah.run(cmd, :stdin => ycp_code, :stdout => :capture, :stderr => :capture)
         rescue Cheetah::ExecutionFailed => e
           ruby_code = e.stdout || ""
           ruby_err  = (e.stderr != "" ? e.stderr : nil) || e.message || ""
