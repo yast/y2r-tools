@@ -11,8 +11,10 @@ module YCP
       require 'fileutils'
       require 'yaml'
 
+      # Config file storing user configuration
       CONFIG_FILE = '.y2rconfig'
-      USER_TYPING_TIMEOUT = 350
+      # Delay between checks whether user is still typing
+      USER_TYPING_TIMEOUT = 400
 
       module Default
         TRANSLATION_TIMEOUT = 400
