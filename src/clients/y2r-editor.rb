@@ -23,6 +23,7 @@ module YCP
 
       module IDs
         YCP = :ycp_code
+	LOAD = :ycp_load
         RUBY = :ruby_code
         CONFIGURE = :configure
         PATH_TO_Y2R = 'path_to_y2r'
@@ -44,7 +45,8 @@ module YCP
       def open_main_dialog
         contents = HBox(
           VBox(
-            MultiLineEdit(term(:id, IDs::YCP), _('YCP'), '')
+            MultiLineEdit(term(:id, IDs::YCP), _('YCP'), ''),
+            PushButton(term(:id, IDs::LOAD), _('Load File'))
           ),
           VBox(
             MultiLineEdit(term(:id, IDs::RUBY), _('Ruby'), '')
@@ -178,6 +180,44 @@ module YCP
         UI.CloseDialog
       end
 
+      def handle_ycp_load
+        dialog = VBox(
+          MarginBox(1, 1,
+            HBox(
+              VBox(
+                HSpacing(40),
+                InputField(term(:id, :filename), term(:opt, :hstretch), _('File Name'), "")
+              ),
+              PushButton(term(:id, :browse), _('Browse')
+            )
+          )),
+          term(:ButtonBox,
+            PushButton(term(:id, IDs::OK_BUTTON), term(:opt, :default, :key_F10), Label.OKButton),
+            PushButton(term(:id, IDs::CANCEL_BUTTON), term(:opt, :key_F9), Label.CancelButton)
+          )
+        )
+
+        UI.OpenDialog dialog
+
+        while true
+          user_ret = UI.UserInput
+          filename = UI.QueryWidget(term(:id, :filename), :Value) || "/"
+          if user_ret == IDs::OK_BUTTON || user_ret == IDs::CANCEL_BUTTON
+            break
+          end
+          if user_ret == :browse
+            filename = UI.AskForExistingFile(filename, "*.ycp", _("Chose the YCP file")) || filename
+	    UI.ChangeWidget(term(:id, :filename), :Value, filename)
+          end
+        end
+
+        UI.CloseDialog
+        if (user_ret == IDs::OK_BUTTON)
+          file = SCR.Read(path(".target.string"), filename)
+          UI.ChangeWidget(term(:id, :ycp_code), :Value, file)
+        end
+      end
+
       def trigger_translation
         @last_ycp_code = ''
       end
@@ -200,6 +240,8 @@ module YCP
               translate_ycp
             when :configure
               handle_configuration
+	    when :ycp_load
+              handle_ycp_load
             else
               Builtins.y2error('Unknown user input: %1', returned)
           end
