@@ -14,18 +14,20 @@ WYSIWYG Editor
     sudo cp -v src/clients/* /usr/share/YaST2/clients
     yast2 y2r-editor
 
-Note: You have to have y2r cloned to /tmp
+Note: You have to have y2r cloned somewhere
 
-    cd /tmp
     git clone git@github.com:yast/y2r.git
     cd y2r
     bundle install
 
+Then run the editor and configure path to y2r, that will be somewehre at
+${cloned_y2r_repository}/bin/y2r
+
 Configuration
 =============
-y2r-editor can be configured using the [Configure] button.
+y2r-editor can be configured using the `[Configure]` button in application.
 You can also edit saved options in YAML-based config file
-later: ${YOUR_HOME}/.y2rconfig
+at `${YOUR_HOME}/.y2rconfig`
 
 y2r arguments can be set in `y2r_args`, for example
 
