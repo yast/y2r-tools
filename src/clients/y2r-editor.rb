@@ -23,7 +23,7 @@ module YCP
 
       module IDs
         YCP = :ycp_code
-	LOAD = :ycp_load
+        LOAD = :ycp_load
         RUBY = :ruby_code
         CONFIGURE = :configure
         PATH_TO_Y2R = 'path_to_y2r'
@@ -207,7 +207,7 @@ module YCP
           end
           if user_ret == :browse
             filename = UI.AskForExistingFile(filename, "*.ycp", _("Chose the YCP file")) || filename
-	    UI.ChangeWidget(term(:id, :filename), :Value, filename)
+            UI.ChangeWidget(term(:id, :filename), :Value, filename)
           end
         end
 
@@ -240,7 +240,7 @@ module YCP
               translate_ycp
             when :configure
               handle_configuration
-	    when :ycp_load
+            when :ycp_load
               handle_ycp_load
             else
               Builtins.y2error('Unknown user input: %1', returned)
