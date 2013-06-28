@@ -6,6 +6,7 @@ module YCP
       YCP.import("UI")
       YCP.import("Wizard")
       YCP.import("Label")
+      YCP.import("Report")
 
       require 'cheetah'
       require 'fileutils'
@@ -221,6 +222,7 @@ module YCP
       end
 
       def handle_ruby_save
+        file = UI.QueryWidget(term(:id, :ruby_code), :Value)
         dialog = VBox(
           MarginBox(1, 1,
             HBox(
@@ -242,7 +244,15 @@ module YCP
         while true
           user_ret = UI.UserInput
           filename = UI.QueryWidget(term(:id, :filename), :Value) || "/"
-          if user_ret == IDs::OK_BUTTON || user_ret == IDs::CANCEL_BUTTON
+          if user_ret == IDs::OK_BUTTON
+            if SCR.Write(path(".target.string"), filename, file)
+              Report.Message(_("Saving file syccessful"))
+              break
+            else
+              Report.Error(_("Failed to save file"))
+            end
+          end
+          if user_ret == IDs::CANCEL_BUTTON
             break
           end
           if user_ret == :browse
@@ -252,10 +262,6 @@ module YCP
         end
 
         UI.CloseDialog
-        if (user_ret == IDs::OK_BUTTON)
-          file = UI.QueryWidget(term(:id, :ruby_code), :Value)
-          SCR.Write(path(".target.string"), filename, file)
-        end
       end
 
       def trigger_translation
