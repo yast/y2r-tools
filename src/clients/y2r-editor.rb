@@ -25,6 +25,7 @@ module YCP
         YCP = :ycp_code
         LOAD = :ycp_load
         RUBY = :ruby_code
+        SAVE = :ruby_save
         CONFIGURE = :configure
         PATH_TO_Y2R = 'path_to_y2r'
         Y2R_ARGS = 'y2r_args'
@@ -49,7 +50,8 @@ module YCP
             PushButton(term(:id, IDs::LOAD), _('Load File'))
           ),
           VBox(
-            MultiLineEdit(term(:id, IDs::RUBY), _('Ruby'), '')
+            MultiLineEdit(term(:id, IDs::RUBY), _('Ruby'), ''),
+            PushButton(term(:id, IDs::SAVE), _('Save File'))
           )
         )
         caption = _('Y2R WYSIWYG Editor')
@@ -218,6 +220,44 @@ module YCP
         end
       end
 
+      def handle_ruby_save
+        dialog = VBox(
+          MarginBox(1, 1,
+            HBox(
+              VBox(
+                HSpacing(40),
+                InputField(term(:id, :filename), term(:opt, :hstretch), _('File Name'), "")
+              ),
+              PushButton(term(:id, :browse), _('Browse')
+            )
+          )),
+          term(:ButtonBox,
+            PushButton(term(:id, IDs::OK_BUTTON), term(:opt, :default, :key_F10), Label.OKButton),
+            PushButton(term(:id, IDs::CANCEL_BUTTON), term(:opt, :key_F9), Label.CancelButton)
+          )
+        )
+
+        UI.OpenDialog dialog
+
+        while true
+          user_ret = UI.UserInput
+          filename = UI.QueryWidget(term(:id, :filename), :Value) || "/"
+          if user_ret == IDs::OK_BUTTON || user_ret == IDs::CANCEL_BUTTON
+            break
+          end
+          if user_ret == :browse
+            filename = UI.AskForSaveFileName(filename, "*.rb", _("Chose the ruby file")) || filename
+            UI.ChangeWidget(term(:id, :filename), :Value, filename)
+          end
+        end
+
+        UI.CloseDialog
+        if (user_ret == IDs::OK_BUTTON)
+          file = UI.QueryWidget(term(:id, :ruby_code), :Value)
+          SCR.Write(path(".target.string"), filename, file)
+        end
+      end
+
       def trigger_translation
         @last_ycp_code = ''
       end
@@ -242,6 +282,8 @@ module YCP
               handle_configuration
             when IDs::LOAD
               handle_ycp_load
+            when IDs::SAVE
+              handle_ruby_save
             else
               Builtins.y2error('Unknown user input: %1', returned)
           end
