@@ -238,9 +238,9 @@ module YCP
             when :timeout
               # TODO: skip if user is still writing
               translate_ycp
-            when :configure
+            when IDs::CONFIGURE
               handle_configuration
-            when :ycp_load
+            when IDs::LOAD
               handle_ycp_load
             else
               Builtins.y2error('Unknown user input: %1', returned)
